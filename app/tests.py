@@ -1,3 +1,9 @@
 from django.test import TestCase
 
-# Create your tests here.
+
+class RoomTest(TestCase):
+    def setUp(self):
+        pass
+
+    def test_show_room_list(self):
+        self.assertEqual(True, False)
