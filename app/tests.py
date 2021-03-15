@@ -565,3 +565,51 @@ class BookingUpdateTest(TestCase):
         self.assertEqual(booking.reservation_from, today)
         self.assertEqual(booking.reservation_to, tomorrow)
         self.assertEqual(booking.rooms.all()[0].room_number, 305)
+
+
+class BookingDeleteTest(TestCase):
+    def setUp(self):
+        today = datetime(2021, 10, 7)
+        tomorrow = datetime(2021, 10, 8)
+        room = Room.objects.create(room_number=305, room_class="A")
+        booking = Booking.objects.create(
+            first_name="John",
+            last_name="Doe",
+            reservation_from=today,
+            reservation_to=tomorrow,
+        )
+        booking.rooms.add(room)
+
+    def test_booking_delete_init_data(self):
+        today = datetime(2021, 10, 7)
+        tomorrow = datetime(2021, 10, 8)
+        existing = Booking.objects.get(pk=1)
+        self.assertEqual(existing.pk, 1)
+        self.assertEqual(existing.rooms.all()[0].room_number, 305)
+        self.assertEqual(existing.first_name, "John")
+        self.assertEqual(existing.last_name, "Doe")
+        self.assertEqual(existing.reservation_from, today)
+        self.assertEqual(existing.reservation_to, tomorrow)
+
+    def test_booking_delete_right_pk(self):
+        # Delete room
+        response = self.client.delete("/api/booking/1/")
+
+        # Check response
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Check database
+        booking = Booking.objects.filter().exists()
+        self.assertEqual(booking, False)
+
+    def test_booking_delete_wrong_pk(self):
+        # Delete booking
+        response = self.client.delete("/api/booking/0/")
+
+        # Check response
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], "Not found.")
+
+        # Check database
+        booking = Booking.objects.filter().exists()
+        self.assertEqual(booking, True)
