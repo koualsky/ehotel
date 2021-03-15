@@ -22,6 +22,7 @@ class RoomSerializer(ModelSerializer):
 
 class BookingSerializer(ModelSerializer):
     total_days = SerializerMethodField()
+    total_cost = SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -32,7 +33,8 @@ class BookingSerializer(ModelSerializer):
             "reservation_from",
             "reservation_to",
             "rooms",
-            "total_days"
+            "total_days",
+            "total_cost"
         )
 
     def to_representation(self, instance):
@@ -50,3 +52,10 @@ class BookingSerializer(ModelSerializer):
     @staticmethod
     def get_total_days(obj):
         return str(obj.reservation_to - obj.reservation_from)
+
+    @staticmethod
+    def get_total_cost(obj):
+        total_cost = 0
+        for room_cost in obj.rooms.all():
+            total_cost += ROOM_CLASSES[room_cost.room_class]
+        return total_cost

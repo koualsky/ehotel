@@ -246,6 +246,44 @@ class BookingGetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["total_days"], expected_days)
 
+    def test_total_cost_for_1_room(self):
+        expected_cost = ROOM_CLASSES["A"]
+        response = self.client.get("/api/booking/1/", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_cost"], expected_cost)
+
+    def test_total_cost_for_2_rooms(self):
+        expected_cost = ROOM_CLASSES["A"] + ROOM_CLASSES["B"]
+        room2 = Room.objects.create(room_number=306, room_class="B")
+        booking = Booking.objects.get(pk=1)
+        booking.rooms.add(room2)
+        response = self.client.get("/api/booking/1/", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_cost"], expected_cost)
+
+    def test_total_cost_for_3_rooms(self):
+        expected_cost = ROOM_CLASSES["A"] + ROOM_CLASSES["B"] + ROOM_CLASSES["C"]
+        room2 = Room.objects.create(room_number=306, room_class="B")
+        room3 = Room.objects.create(room_number=307, room_class="C")
+        booking = Booking.objects.get(pk=1)
+        booking.rooms.add(room2)
+        booking.rooms.add(room3)
+        response = self.client.get("/api/booking/1/", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_cost"], expected_cost)
+
+    def test_total_cost_for_4_rooms(self):
+        expected_cost = ROOM_CLASSES["A"] + ROOM_CLASSES["B"] + ROOM_CLASSES["C"] + ROOM_CLASSES["D"]
+        room2 = Room.objects.create(room_number=306, room_class="B")
+        room3 = Room.objects.create(room_number=307, room_class="C")
+        room4 = Room.objects.create(room_number=308, room_class="D")
+        booking = Booking.objects.get(pk=1)
+        booking.rooms.add(room2)
+        booking.rooms.add(room3)
+        booking.rooms.add(room4)
+        response = self.client.get("/api/booking/1/", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_cost"], expected_cost)
 
 class BookingCreateTest(TestCase):
     def setUp(self):
