@@ -220,34 +220,6 @@ class RoomDeleteTest(TestCase):
         room = Room.objects.filter().exists()
         self.assertEqual(room, True)
 
-    # def test_room_update_right_room_number_with_wrong_room_class(self):
-    #     # Update existing room
-    #     data = json.dumps({"room_number": 333, "room_class": "E"})
-    #     response = self.client.put("/api/room/1/", data, content_type="application/json")
-    #
-    #     # Check response
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    #     self.assertEqual(response.data['room_class'][0], '"E" is not a valid choice.')
-    #
-    #     # Check database
-    #     room = Room.objects.get(pk=1)
-    #     self.assertEqual(room.room_number, 305)
-    #     self.assertEqual(room.room_class, "A")
-    #
-    # def test_room_update_wrong_room_number_with_right_room_class(self):
-    #     # Update existing room
-    #     data = json.dumps({"room_number": 0, "room_class": "D"})
-    #     response = self.client.put("/api/room/1/", data, content_type="application/json")
-    #
-    #     # Check response
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    #     self.assertEqual(response.data['room_number'][0], "The room number must be an integer between 0 and 1 000 000.")
-    #
-    #     # Check database
-    #     room = Room.objects.get(pk=1)
-    #     self.assertEqual(room.room_number, 305)
-    #     self.assertEqual(room.room_class, "A")
-
 
 # class BookingListTest(TestCase):
 
