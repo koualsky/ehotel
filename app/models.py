@@ -8,8 +8,8 @@ class Room(models.Model):
     room_number = models.PositiveIntegerField(unique=True)
     room_class = models.CharField(
         max_length=32,
-        choices=[item for item in ROOM_CLASSES.items()],
-        default=ROOM_CLASSES['A'],
+        choices=[(key, key) for key, value in ROOM_CLASSES.items()],
+        default="A",
     )
 
     def __str__(self):
