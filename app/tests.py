@@ -285,6 +285,7 @@ class BookingGetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["total_cost"], expected_cost)
 
+
 class BookingCreateTest(TestCase):
     def setUp(self):
         Room.objects.create(room_number=305, room_class="A")
