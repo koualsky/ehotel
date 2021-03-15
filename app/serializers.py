@@ -21,9 +21,19 @@ class RoomSerializer(ModelSerializer):
 
 
 class BookingSerializer(ModelSerializer):
+    total_days = SerializerMethodField()
+
     class Meta:
         model = Booking
-        fields = "__all__"
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "reservation_from",
+            "reservation_to",
+            "rooms",
+            "total_days"
+        )
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -36,3 +46,7 @@ class BookingSerializer(ModelSerializer):
         if reservation_to <= reservation_from:
             raise ValidationError("The reservation_to field should be greater than reservation_from.")
         return data
+
+    @staticmethod
+    def get_total_days(obj):
+        return str(obj.reservation_to - obj.reservation_from)

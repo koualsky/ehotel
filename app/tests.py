@@ -2,10 +2,13 @@ from django.test import TestCase
 from rest_framework import status
 import json
 from datetime import datetime
-from .models import Room, Booking
+from .models import Room, Booking, ROOM_CLASSES
 
 
 # class RoomListTest(TestCase):
+
+
+# class RoomGetTest(TestCase):
 
 
 class RoomCreateTest(TestCase):
@@ -222,6 +225,26 @@ class RoomDeleteTest(TestCase):
 
 
 # class BookingListTest(TestCase):
+
+
+class BookingGetTest(TestCase):
+    def setUp(self):
+        today = datetime(2021, 10, 7)
+        tomorrow = datetime(2021, 10, 8)
+        room = Room.objects.create(room_number=305, room_class="A")
+        booking = Booking.objects.create(
+            first_name="John",
+            last_name="Doe",
+            reservation_from=today,
+            reservation_to=tomorrow,
+        )
+        booking.rooms.add(room)
+
+    def test_total_days(self):
+        expected_days = '1 day, 0:00:00'
+        response = self.client.get("/api/booking/1/", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_days"], expected_days)
 
 
 class BookingCreateTest(TestCase):
