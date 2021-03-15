@@ -1,8 +1,7 @@
 from django.test import TestCase
 from rest_framework import status
 import json
-import pytz
-from datetime import datetime, timedelta
+from datetime import datetime
 from .models import Room, Booking
 
 
@@ -493,3 +492,104 @@ class BookingCreateTest(TestCase):
         # Check database
         from_database = Booking.objects.filter().exists()
         self.assertEqual(from_database, False)
+
+
+class BookingUpdateTest(TestCase):
+    def setUp(self):
+        today = datetime(2021, 10, 7)
+        tomorrow = datetime(2021, 10, 8)
+        room = Room.objects.create(room_number=305, room_class="A")
+        booking = Booking.objects.create(
+            first_name="John",
+            last_name="Doe",
+            reservation_from=today,
+            reservation_to=tomorrow,
+        )
+        booking.rooms.add(room)
+
+    def test_booking_update_init_data(self):
+        today = datetime(2021, 10, 7)
+        tomorrow = datetime(2021, 10, 8)
+        existing = Booking.objects.get(pk=1)
+        self.assertEqual(existing.pk, 1)
+        self.assertEqual(existing.rooms.all()[0].room_number, 305)
+        self.assertEqual(existing.first_name, "John")
+        self.assertEqual(existing.last_name, "Doe")
+        self.assertEqual(existing.reservation_from, today)
+        self.assertEqual(existing.reservation_to, tomorrow)
+
+    def test_booking_update_right_values(self):
+        Room.objects.create(room_number=306, room_class="B")
+        today = datetime(2021, 10, 11)
+        tomorrow = datetime(2021, 10, 22)
+
+        data = json.dumps({
+            "first_name": "Jimmy",
+            "last_name": "Zoe",
+            "reservation_from": today.isoformat(),
+            "reservation_to": tomorrow.isoformat(),
+            "rooms": [1, 2],
+        })
+        response = self.client.put("/api/booking/1/", data, content_type="application/json")
+
+        # Check response
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check database
+        booking = Booking.objects.get(pk=1)
+        self.assertEqual(booking.first_name, "Jimmy")
+        self.assertEqual(booking.last_name, "Zoe")
+        self.assertEqual(booking.reservation_from, today)
+        self.assertEqual(booking.reservation_to, tomorrow)
+        self.assertEqual(booking.rooms.all()[0].room_number, 305)
+        self.assertEqual(booking.rooms.all()[1].room_number, 306)
+
+
+    def test_booking_update_equal_reservation_dates(self):
+        today_old = datetime(2021, 10, 7)
+        tomorrow_old = datetime(2021, 10, 8)
+        today = datetime(2021, 10, 11)
+
+        data = json.dumps({
+            "first_name": "Jimmy",
+            "last_name": "Zoe",
+            "reservation_from": today.isoformat(),
+            "reservation_to": today.isoformat(),
+            "rooms": [1],
+        })
+        response = self.client.put("/api/booking/1/", data, content_type="application/json")
+
+        # Check response
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check database
+        booking = Booking.objects.get(pk=1)
+        self.assertEqual(booking.first_name, "John")
+        self.assertEqual(booking.last_name, "Doe")
+        self.assertEqual(booking.reservation_from, today_old)
+        self.assertEqual(booking.reservation_to, tomorrow_old)
+        self.assertEqual(booking.rooms.all()[0].room_number, 305)
+
+    def test_booking_update_reservation_from_greater_than_reservation_to(self):
+        today = datetime(2021, 10, 7)
+        tomorrow = datetime(2021, 10, 8)
+
+        data = json.dumps({
+            "first_name": "Jimmy",
+            "last_name": "Zoe",
+            "reservation_from": tomorrow.isoformat(),
+            "reservation_to": today.isoformat(),
+            "rooms": [1],
+        })
+        response = self.client.put("/api/booking/1/", data, content_type="application/json")
+
+        # Check response
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check database
+        booking = Booking.objects.get(pk=1)
+        self.assertEqual(booking.first_name, "John")
+        self.assertEqual(booking.last_name, "Doe")
+        self.assertEqual(booking.reservation_from, today)
+        self.assertEqual(booking.reservation_to, tomorrow)
+        self.assertEqual(booking.rooms.all()[0].room_number, 305)
