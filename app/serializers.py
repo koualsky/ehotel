@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
 from .models import Room, Booking, ROOM_CLASSES
 
 
@@ -12,6 +12,12 @@ class RoomSerializer(ModelSerializer):
     @staticmethod
     def get_price(obj):
         return ROOM_CLASSES[obj.room_class]
+
+    @staticmethod
+    def validate_room_number(room_number):
+        if not (1 <= room_number <= 1000000):
+            raise ValidationError("The room number must be an integer between 0 and 1 000 000.")
+        return room_number
 
 
 class BookingSerializer(ModelSerializer):
