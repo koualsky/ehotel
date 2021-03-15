@@ -29,3 +29,10 @@ class BookingSerializer(ModelSerializer):
         rep = super().to_representation(instance)
         rep['rooms'] = RoomSerializer(instance.rooms.all(), many=True).data
         return rep
+
+    def validate(self, data):
+        reservation_from = data["reservation_from"]
+        reservation_to = data["reservation_to"]
+        if reservation_to <= reservation_from:
+            raise ValidationError("The reservation_to field should be greater than reservation_from.")
+        return data
