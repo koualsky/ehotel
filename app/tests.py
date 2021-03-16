@@ -675,3 +675,104 @@ class BookingDeleteTest(TestCase):
         # Check database
         booking = Booking.objects.filter().exists()
         self.assertEqual(booking, True)
+
+
+class BookingFilteringTest(TestCase):
+    def setUp(self):
+
+        # Rooms
+        room1 = Room.objects.create(room_number=301, room_class="A")
+        room2 = Room.objects.create(room_number=302, room_class="B")
+        room3 = Room.objects.create(room_number=303, room_class="C")
+        room4 = Room.objects.create(room_number=304, room_class="D")
+
+        # Bookings
+        booking1 = Booking.objects.create(
+            first_name="John",
+            last_name="Doe",
+            reservation_from=datetime(2021, 10, 1),
+            reservation_to=datetime(2021, 10, 14),
+        )
+        booking1.rooms.add(room1)
+
+        booking2 = Booking.objects.create(
+            first_name="John",
+            last_name="Lennon",
+            reservation_from=datetime(2021, 10, 2),
+            reservation_to=datetime(2021, 10, 15),
+        )
+        booking2.rooms.add(room2)
+
+        booking3 = Booking.objects.create(
+            first_name="Jimmy",
+            last_name="Doe",
+            reservation_from=datetime(2021, 10, 3),
+            reservation_to=datetime(2021, 10, 16),
+        )
+        booking3.rooms.add(room3)
+
+        booking4 = Booking.objects.create(
+            first_name="Jimmy",
+            last_name="Lennon",
+            reservation_from=datetime(2021, 10, 4),
+            reservation_to=datetime(2021, 10, 17),
+        )
+        booking4.rooms.add(room4)
+
+    def test_filtering_by_room_number(self):
+        response = self.client.get("/api/booking/?room_number=301", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["rooms"][0]["room_number"], 301)
+
+        response = self.client.get("/api/booking/?room_number=302", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["rooms"][0]["room_number"], 302)
+
+        response = self.client.get("/api/booking/?room_number=303", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["rooms"][0]["room_number"], 303)
+
+        response = self.client.get("/api/booking/?room_number=304", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["rooms"][0]["room_number"], 304)
+
+    def test_filtering_by_last_name(self):
+        response = self.client.get("/api/booking/?last_name=Doe", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["last_name"], "Doe")
+        self.assertEqual(response.data[1]["last_name"], "Doe")
+
+    def test_filtering_by_reservation_from(self):
+        response = self.client.get("/api/booking/?reservation_from=2021-10-3", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["last_name"], "Doe")
+        self.assertEqual(response.data[0]["rooms"][0]["room_number"], 303)
+        self.assertEqual(response.data[1]["last_name"], "Lennon")
+        self.assertEqual(response.data[1]["rooms"][0]["room_number"], 304)
+
+    def test_filtering_by_reservation_to(self):
+        response = self.client.get("/api/booking/?reservation_to=2021-10-15", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["last_name"], "Doe")
+        self.assertEqual(response.data[0]["rooms"][0]["room_number"], 301)
+        self.assertEqual(response.data[1]["last_name"], "Lennon")
+        self.assertEqual(response.data[1]["rooms"][0]["room_number"], 302)
+
+    def test_filtering_by_reservation_from_wrong_date_format(self):
+        response = self.client.get("/api/booking/?reservation_from=2021-103-ad", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0], "time data '2021-103-ad' does not match format '%Y-%m-%d'")
+
+    def test_filtering_by_reservation_to_wrong_date_format(self):
+        response = self.client.get("/api/booking/?reservation_from=2021-13-01", content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0], "time data '2021-13-01' does not match format '%Y-%m-%d'")
