@@ -25,7 +25,7 @@ SECRET_KEY = 'b3sf4qbe=*x7#fgg7(@5_hp=9r+74=lz@2^3t&@=%@xi%0o#@l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -119,15 +119,6 @@ USE_L10N = True
 USE_TZ = False
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-CORS_ALLOW_METHODS = (
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
