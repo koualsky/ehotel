@@ -1,7 +1,7 @@
 # Run
-####Local: http://127.0.0.1:8000/api/
-####Backend API on heroku: https://eeehotel.herokuapp.com/api/
-####Frontend app on heroku: https://eeehotel-frontend.herokuapp.com/
+Local: http://127.0.0.1:8000/api/ \
+Backend API on heroku: https://eeehotel.herokuapp.com/api/ \
+Frontend app on heroku: https://eeehotel-frontend.herokuapp.com/ 
 
 # API
 
@@ -71,11 +71,11 @@ body example:
 Delete:\
 DELETE `/api/booking/{booking_id}/`
 
-# Filter booking (example)
+# Filter bookings (example)
 This GET request:\
 `/api/booking/?room_nuber=303&last_name=Lennon&reservation_from=2020-10-7&reservation_to=2020-10-14`
 
-will return all bookings witch contains: \
+will return all bookings which contains: \
 room number - 303\
 Last name - Lennon\
-Reservation date between Oct 7 2020 and Oct 14 2020.\
+Reservation date between Oct 7 2020 and Oct 14 2020.
