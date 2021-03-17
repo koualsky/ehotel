@@ -2,6 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import status
 from datetime import datetime
 
 from .models import Room, Booking
@@ -26,6 +27,49 @@ class BookingViewSet(ModelViewSet):
     # permission_classes = (IsAuthenticated,)
     serializer_class = BookingSerializer
     queryset = Booking.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        # Change room_numbers to pk
+        rooms_pk = []
+        rooms_numbers = request.data['rooms']
+        for room in rooms_numbers:
+            try:
+                room_pk = Room.objects.get(room_number=room).pk
+            except Room.DoesNotExist as err:
+                raise ValidationError("Room {} does not exist.".format(room))
+            rooms_pk.append(room_pk)
+        request.data['rooms'] = rooms_pk
+
+        # Create
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def update(self, request, *args, **kwargs):
+        # Change room_numbers to pk
+        rooms_pk = []
+        rooms_numbers = request.data['rooms']
+        for room in rooms_numbers:
+            try:
+                room_pk = Room.objects.get(room_number=room).pk
+            except Room.DoesNotExist as err:
+                raise ValidationError("Room {} does not exist.".format(room))
+            rooms_pk.append(room_pk)
+        request.data['rooms'] = rooms_pk
+
+        # Update
+        partial = True
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
 
     def list(self, request):
         if self.request.GET:

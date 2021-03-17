@@ -303,7 +303,7 @@ class BookingCreateTest(TestCase):
 
         # Check response
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["rooms"][0], 'Expected a list of items but got type "str".')
+        self.assertEqual(response.data["rooms"][0], 'This list may not be empty.')
         self.assertEqual(response.data["first_name"][0], 'This field may not be blank.')
         self.assertEqual(response.data["last_name"][0], 'This field may not be blank.')
         self.assertEqual(response.data["reservation_from"][0], 'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].')
@@ -318,7 +318,7 @@ class BookingCreateTest(TestCase):
         today = datetime(2021, 10, 7)
         tomorrow = datetime(2021, 10, 8)
         data = json.dumps({
-            "rooms": [1],
+            "rooms": [305],
             "first_name": "John",
             "last_name": "Doe",
             "reservation_from": today.isoformat(),
@@ -417,7 +417,7 @@ class BookingCreateTest(TestCase):
         today = datetime(2021, 10, 7)
         tomorrow = datetime(2021, 10, 11)
         data = json.dumps({
-            "rooms": [1, 2],
+            "rooms": [305, 306],
             "first_name": "Jimmy",
             "last_name": "Zoe",
             "reservation_from": today.isoformat(),
@@ -562,7 +562,7 @@ class BookingUpdateTest(TestCase):
             "last_name": "Zoe",
             "reservation_from": today.isoformat(),
             "reservation_to": tomorrow.isoformat(),
-            "rooms": [1, 2],
+            "rooms": [305, 306],
         })
         response = self.client.put("/api/booking/1/", data, content_type="application/json")
 
