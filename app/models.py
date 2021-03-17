@@ -1,7 +1,7 @@
 from django.db import models
 
 
-ROOM_CLASSES = {'A': 200, 'B': 150, 'C': 100, 'D': 50}
+ROOM_CLASSES = {"A": 200, "B": 150, "C": 100, "D": 50}
 
 
 class Room(models.Model):
@@ -24,9 +24,11 @@ class Booking(models.Model):
     reservation_to = models.DateTimeField()
 
     def __str__(self):
-        return str("{} {} (from {} to {})".format(
-            self.first_name,
-            self.last_name,
-            self.reservation_from,
-            self.reservation_to
-        ))
+        return str(
+            "{} {} (from {} to {})".format(
+                self.first_name,
+                self.last_name,
+                self.reservation_from,
+                self.reservation_to,
+            )
+        )

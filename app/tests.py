@@ -1,8 +1,10 @@
-from django.test import TestCase
-from rest_framework import status
 import json
 from datetime import datetime
-from .models import Room, Booking, ROOM_CLASSES
+
+from django.test import TestCase
+from rest_framework import status
+
+from .models import ROOM_CLASSES, Booking, Room
 
 
 # class RoomListTest(TestCase):
@@ -168,7 +170,7 @@ class RoomUpdateTest(TestCase):
 
         # Check response
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['room_class'][0], '"E" is not a valid choice.')
+        self.assertEqual(response.data["room_class"][0], '"E" is not a valid choice.')
 
         # Check database
         room = Room.objects.get(pk=1)

@@ -4,10 +4,10 @@ from .api import RoomViewSet, BookingViewSet
 
 
 router = DefaultRouter()
-router.register(r'room', RoomViewSet)
-router.register(r'booking', BookingViewSet)
+router.register(r"room", RoomViewSet)
+router.register(r"booking", BookingViewSet)
 
 
 urlpatterns = [
-    url(r'^api/', include(router.urls)),
+    url(r"^api/", include(router.urls)),
 ]
