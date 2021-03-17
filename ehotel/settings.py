@@ -25,12 +25,7 @@ SECRET_KEY = 'b3sf4qbe=*x7#fgg7(@5_hp=9r+74=lz@2^3t&@=%@xi%0o#@l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '::1',
-    'eeehotel.herokuapp.com',
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
