@@ -55,7 +55,8 @@ class BookingSerializer(ModelSerializer):
 
     @staticmethod
     def get_total_cost(obj):
+        total_days_int = (obj.reservation_to - obj.reservation_from).days
         total_cost = 0
         for room_cost in obj.rooms.all():
             total_cost += ROOM_CLASSES[room_cost.room_class]
-        return total_cost
+        return total_cost * total_days_int
